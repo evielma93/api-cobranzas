@@ -1,0 +1,1 @@
+npm i axios cors dotenv exceljs express express-validator uuid csv-parser iconv-lite mysql2 ssh2-sftp-client
