@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
-    host: '35.207.24.45',
-    user: 'cobranzas',
-    password: '$vEzf9vkvEBfarAus%YYdrnJQ34',
-    database: 'cobranzas_mem',
+    host: process.env.SFTP_HOST,
+    user: process.env.SFTP_HOST,
+    password: process.env.SFTP_HOST,
+    database: process.env.SFTP_HOST,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
