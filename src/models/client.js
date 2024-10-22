@@ -18,6 +18,17 @@ class ClientModel {
             throw error;
         }
     }
+    
+    async selectAllCxc() {
+        try {
+            const result = await query(this.script.selectAllCxc());
+            console.log(result);
+            return result;
+        } catch (error) {
+            console.error('Error al obtener Facturas:', error);
+            throw error;
+        }
+    }
 
 }
 

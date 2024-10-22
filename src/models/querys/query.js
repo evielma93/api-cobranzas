@@ -24,6 +24,10 @@ class Script{
     selectCxc(){
         return `SELECT * FROM cuentasxcobrar limit 10`;
     }
+    
+    selectAllCxc(){
+        return `SELECT * FROM vista_reporte_cuentasxcobrar WHERE length(telefono) = 10 LIMIT 5`;
+    }
 
 
 }
