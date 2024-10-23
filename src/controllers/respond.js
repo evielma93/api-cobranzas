@@ -1,11 +1,10 @@
 const axios = require('axios').default;
 const TOKEN = process.env.TOKEN;
 
-const url = `https://api.respond.io/v2/contact/phone:+593962517172`;
+const url2 = `https://api.respond.io/v2/contact/create_or_update/phone:+numberPhone`;
 const config = { headers: { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json','Accept': 'application/json, application/xml, multipart/form-data' }, timeout: 30000 };
 
 const getContact = async (req, res) => {
-  // https://api.respond.io/v2/contact/phone:+593962517172
   const options = {
     method: 'GET',
     url: 'https://api.respond.io/v2/contact/phone:+593962517172',
@@ -24,39 +23,17 @@ const getContact = async (req, res) => {
   }
 }
 
-const createContact = async (req, res) => {
-
-  const { firstName, lastName, phone, email, language, countryCode } = req.body;
-  try {
-      const body = {
-          firstName,
-          lastName,
-          phone,
-          email,
-          language,
-          countryCode
-      }
-    const data = await axios.post(url,body,config);
-    console.log(data);
-    res.json(data);
-  } catch (error) {
-    console.error(error);
-    res.json(error);
-  }
-}
 
 async function create_or_update_contact(client) {
 
   let phone = obtCel(client.telefono);
-
-  // console.log(phone);
-  // return false;
-
   const body = {
     firstName: client.cliente,
     lastName: client.cliente,
-    phone: client.telefono,
-    email:client.correo,
+    phone: phone,
+    email:validarEmailCliente(client.correo),
+    language:'es',
+    countryCode: 'EC',
     custom_fields: [
       {
         name: "cedula",
@@ -82,11 +59,11 @@ async function create_or_update_contact(client) {
   };
 
   try {
-    const url2 = `https://api.respond.io/v2/contact/create_or_update/phone:+${phone}`;
-    const data = await axios.post(url2,body,config); 
+    let url = formatResponse(url2,phone);
+    const data = await axios.post(url,body,config); 
     return data;
   } catch (error) {
-    console.error('Error creating or updating contact:', error);
+    console.error('Error creando o actualizando contacto:', error);
     throw error;
   }
 }
@@ -95,10 +72,8 @@ function obtCel(array) {
   if (array !== "" && array !== null) {
       array = array.split(" ");
       const patron = /\([DE]\)/g;
-
       for (let cel of array) {
           cel = cel.replace(patron, "");
-          
           if (cel.length === 10 && cel.startsWith("09")) {
               return '593' + cel.slice(1);
           }
@@ -112,8 +87,23 @@ function obtCel(array) {
 }
 
 
+function esCorreoValido(correo) {
+  const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  return regex.test(correo);
+}
+
+function validarEmailCliente(correo) {
+  if (!correo || !esCorreoValido(correo)) {
+      correo = "default@example.com";
+  }
+  return correo;
+}
+
+// Función para reemplazar el placeholder ${phone} con el teléfono del contacto
+const formatResponse = (messageTemplate, phone) => {
+  return messageTemplate.replace('+numberPhone','+'+phone);
+};
 
 
 
-
-module.exports = { getContact, createContact,create_or_update_contact }
+module.exports = { getContact,create_or_update_contact }
